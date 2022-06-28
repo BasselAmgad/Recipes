@@ -27,29 +27,37 @@ class Data
     {
         Recipes.Add(r);
     }
+    public void removeRecipe(string title)
+    {
+        Recipes.RemoveAll(x => x.Title == title);
+    }
 
     public void editTitle(string title, string newTitle)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Title = newTitle);
+        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Title = newTitle).ToList();
     }
     public void editIngredients(string title, string newIngredients)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Ingredients = newIngredients);
+        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Ingredients = newIngredients).ToList();
     }
     public void editInstructions(string title, string newInstructions)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Instructions = newInstructions);   
+        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Instructions = newInstructions).ToList();   
     }
     
     public void addCategory(string title, string newCategory)
     {
-        //customers.Where(c => c.IsValid).Select(c => { c.CreditLimit = 1000; return c; }).ToList();
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Add(newCategory); return r; }).ToList();
 
     }
     public void editCategory(string title, string category, string newCategory)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Remove(category);r.Categories.Add(newCategory); return r; }).ToList();
+    }
+
+    public void removeCategory(string title,string category)
+    {
+        Recipes.Where(r => r.Title == title).ToList()[0].Categories.RemoveAll(c=>c == category);
     }
     public void saveRecipes()
     {
