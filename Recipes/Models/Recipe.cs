@@ -5,9 +5,9 @@ class Recipe
     public string Title { get; set; }
     public string Ingredients { get; set; }
     public string Instructions { get; set; }
-    public Categories[] Categories { get; set; }
+    public List<String> Categories { get; set; }
 
-    public Recipe(string title, string ingredients, string instructions, Categories[] categories)
+    public Recipe(string title, string ingredients, string instructions, List<String> categories)
     {
         Title = title;
         Ingredients = ingredients;
@@ -17,10 +17,4 @@ class Recipe
 
 }
 
-enum Categories
-{
-    Breakfast,
-    Lunch,
-    Dinner,
-    Snack
-}
+
