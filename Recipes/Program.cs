@@ -69,9 +69,10 @@ static void AddRecipe(ref Data data)
     for (int i=0;i<10;i++){
         
         var category = AnsiConsole.Ask<string>("Category: ");
-        categories.Add(category);
         if (category == "Done")
             break;
+        categories.Add(category);
+        
     }
     data.addRecipe(new Recipe(title,ingredients,instructions,categories));
 
