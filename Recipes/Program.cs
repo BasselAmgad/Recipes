@@ -64,8 +64,8 @@ static void AddRecipe(ref Data data)
     var ingredients = AnsiConsole.Ask<string>("What are the needed [dodgerblue2]ingredients[/]?");
     var instructions = AnsiConsole.Ask<string>("What are the  [dodgerblue2]instuctions[/]?");
     List<string> categories = new List<string>();
-    AnsiConsole.Markup("Please insert the [dodgerblue2]categories[/] of your recipe");
-    AnsiConsole.Markup("Press Enter after writing the category to add another, if you are done write [red]Done[/] then press Enter");
+    AnsiConsole.Markup("Please insert the [dodgerblue2]categories[/] of your recipe \n");
+    AnsiConsole.Markup("Press Enter after writing the category to add another, if you are done write [red]Done[/] then press Enter \n");
     for (int i=0;i<10;i++){
         
         var category = AnsiConsole.Ask<string>("Category: ");
