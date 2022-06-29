@@ -7,7 +7,6 @@ using System.Text.Json;
 
 class Data
 {
-
     public List<Recipe> Recipes { get; set; }
     private string _filePath;
     public Data()
@@ -69,6 +68,5 @@ class Data
     {
         File.WriteAllText(_filePath, JsonSerializer.Serialize(Recipes));
     }
-
 
 }

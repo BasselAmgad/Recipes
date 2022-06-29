@@ -29,14 +29,14 @@ while (true)
         var table = new Table().Border(TableBorder.Ascii2);
         table.Expand();
         table.AddColumn("[dodgerblue2]Title[/]");
-        table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
+        table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").LeftAligned());
         table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
-        table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
+        table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").LeftAligned());
         // Add the details of the recipe to the table
         Recipe selectedRecipe = data.Recipes.FirstOrDefault(r => r.Title == recipeTitle);
         table.AddRow(selectedRecipe.Title,
-                     String.Join("\n", selectedRecipe.Ingredients.Select((x) => $"- {x}")),
-                     String.Join("\n", selectedRecipe.Instructions.Select((x, n) => $"{n + 1}. {x}")),
+                     String.Join("\n", selectedRecipe.Ingredients.Split(",").Select((x) => $"- {x}")),
+                     String.Join("\n", selectedRecipe.Instructions.Split(",").Select((x, n) => $"{n + 1}. {x}")),
                      String.Join("\n", selectedRecipe.Categories.Select((x) => $"- {x}")));
         AnsiConsole.Write(table);
         choice = AnsiConsole.Prompt(
@@ -184,9 +184,9 @@ static string MultiLineInput(ref Data data, string text)
         input = AnsiConsole.Ask<string>("- ");
         if (input == "Done")
             break;
-        inputString.Concat(input+",");
+        inputString+=$"{input}, ";
     }
-    return inputString;
+    return inputString.Substring(0,inputString.Length-2);
 }
 
 static List<string> ListInput(ref Data data, string text)
@@ -207,8 +207,10 @@ static List<string> ListInput(ref Data data, string text)
 
 static string stringLimiter(string input)
 {
+    Console.WriteLine(input);
     if (input.Length > 30)
         return input.Substring(0, 30) + "...";
+    
     return input;
 }
 
@@ -232,9 +234,9 @@ static void RecipeTableView(ref Data data)
     table.Expand();
     // Create Table Columns
     table.AddColumn("[dodgerblue2]Title[/]");
-    table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
+    table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").LeftAligned());
     table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
-    table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
+    table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").LeftAligned());
     // Add the Recipes to the table
     data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]",
                                             stringLimiter(r.Ingredients),
