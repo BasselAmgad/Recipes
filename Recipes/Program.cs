@@ -18,7 +18,6 @@ while (true)
     
     if(choice =="View Recipe")
     {
-       
         // View recipes
         var recipeTitle = RecipeSelection(ref data, "Choose which recipe you would like to view: ");
         AnsiConsole.Clear();
