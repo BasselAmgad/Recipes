@@ -28,17 +28,14 @@ class Data
                 Recipes = JsonSerializer.Deserialize<List<Recipe>>(json);
             }
         }
-
-
     }
-
     public void AddRecipe(Recipe r)
     {
         Recipes.Add(r);
     }
     public void RemoveRecipe(string title)
     {
-        Recipes.RemoveAll(x => x.Title == title);
+        Recipes.Remove(Recipes.Find(r=>r.Title==title));
     }
 
     public void EditTitle(string title, string newTitle)
@@ -53,20 +50,19 @@ class Data
     {
         Recipes.Find(r => r.Title == title).Instructions = newInstructions;
     }
-
     public void AddCategory(string title, string newCategory)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Add(newCategory); return r; }).ToList();
+        Recipes.Find(r=>r.Title==title).Categories.Add(newCategory);
 
     }
-    public void EditCategory(string title, string category, string newCategory)
-    {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Remove(category); r.Categories.Add(newCategory); return r; }).ToList();
-    }
-
     public void RemoveCategory(string title, string category)
     {
         Recipes.Where(r => r.Title == title).ToList()[0].Categories.RemoveAll(c => c == category);
+    }
+    public void EditCategory(string title, string category, string newCategory)
+    {
+        RemoveCategory(title, newCategory);
+        AddCategory(title, newCategory);
     }
     public void SaveRecipes()
     {

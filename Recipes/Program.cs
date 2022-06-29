@@ -172,7 +172,7 @@ static string RecipeSelection(ref Data data, string text)
         .Title(text)
         .PageSize(10)
         .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(data.Recipes.Select(r => r.Title)
+        .AddChoices(data.Recipes.Select((r,n) =>$"{n+1}. {r.Title}" )
         ));
 }
 
