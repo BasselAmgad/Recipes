@@ -19,7 +19,7 @@ while (true)
     // Create Table Columns
     table.AddColumn("[dodgerblue2]Title[/]");
     table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
-    table.AddColumn(new TableColumn("[dodgerblue2]Instuctions[/]").LeftAligned());
+    table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
     table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
     // Add the Recipes to the table
     data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]", r.Ingredients, r.Instructions, string.Join(", ", r.Categories.ToArray())).AddEmptyRow());
