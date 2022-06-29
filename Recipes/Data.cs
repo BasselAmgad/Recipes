@@ -7,21 +7,22 @@ using System.Text.Json;
 
 class Data
 {
-    string curFile = @"C:\Users\RS3\source\repos\Recipes\Recipes\recipes.json";
+    
     public List<Recipe> Recipes { get; set; }
-
+    private string _filePath;
     public Data()
-    {   // Need to handle if the file doenst exist
-
-
-        if (!File.Exists(curFile))
+    {   
+        // This method creates a path where we have access to read and write data inside the ProgramData folder
+        var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        _filePath = Path.Combine(systemPath, "Recipes.json");
+        if (!File.Exists(this._filePath))
         {
             Recipes = new List<Recipe>();
-            File.WriteAllText(curFile, JsonSerializer.Serialize(Recipes));
+            File.WriteAllText(this._filePath, JsonSerializer.Serialize(Recipes));
         }
         else
         {
-            using (StreamReader r = new StreamReader(curFile))
+            using (StreamReader r = new StreamReader(this._filePath))
             {
                 string json = r.ReadToEnd();
                 Recipes = JsonSerializer.Deserialize<List<Recipe>>(json);
@@ -42,7 +43,7 @@ class Data
 
     public void EditTitle(string title, string newTitle)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Title = newTitle).ToList();
+        Recipes.FindAll(r=>r.Title==title).ForEach(r=>r.Title=newTitle);
     }
     public void EditIngredients(string title, string newIngredients)
     {
@@ -69,7 +70,7 @@ class Data
     }
     public void SaveRecipes()
     {
-        File.WriteAllText(curFile, JsonSerializer.Serialize(Recipes));
+        File.WriteAllText(_filePath, JsonSerializer.Serialize(Recipes));
     }
 
 
