@@ -7,8 +7,8 @@ using System.Text.Json;
 
 class Data
 {
-
-    public List<Recipe> Recipes { get; set; }
+    // Always initialize list properties with new(). This way we eliminate risk of null.
+    public List<Recipe> Recipes = new();
     private string _filePath;
     public Data()
     {
