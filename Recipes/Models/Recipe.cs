@@ -3,11 +3,11 @@
 class Recipe
 {
     public string Title { get; set; }
-    public string Ingredients { get; set; }
-    public string Instructions { get; set; }
+    public List<String> Ingredients { get; set; }
+    public List<String> Instructions { get; set; }
     public List<String> Categories { get; set; }
 
-    public Recipe(string title, string ingredients, string instructions, List<String> categories)
+    public Recipe(string title, List<String> ingredients, List<String> instructions, List<String> categories)
     {
         Title = title;
         Ingredients = ingredients;

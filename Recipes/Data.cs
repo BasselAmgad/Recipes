@@ -12,14 +12,22 @@ class Data
 
     public Data()
     {   // Need to handle if the file doenst exist
-        
-        
 
-        using (StreamReader r = new StreamReader(curFile))
+
+        if (!File.Exists(curFile))
         {
-            string json = r.ReadToEnd();
-            Recipes = JsonSerializer.Deserialize<List<Recipe>>(json);
+            Recipes = new List<Recipe>();
+            File.WriteAllText(curFile, JsonSerializer.Serialize(Recipes));
         }
+        else
+        {
+            using (StreamReader r = new StreamReader(curFile))
+            {
+                string json = r.ReadToEnd();
+                Recipes = JsonSerializer.Deserialize<List<Recipe>>(json);
+            }
+        }
+        
         
     }
 
@@ -38,11 +46,11 @@ class Data
     }
     public void editIngredients(string title, string newIngredients)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Ingredients = newIngredients).ToList();
+        Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Ingredients.Remove(newIngredients); r.Categories.Add(newIngredients); return r; }).ToList();
     }
     public void editInstructions(string title, string newInstructions)
     {
-        Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Instructions = newInstructions).ToList();   
+        Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Ingredients.Remove(newInstructions); r.Categories.Add(newInstructions); return r; }).ToList();
     }
     
     public void addCategory(string title, string newCategory)

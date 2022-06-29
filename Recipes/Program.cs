@@ -22,7 +22,10 @@ while (true)
     table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
     table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
     // Add the Recipes to the table
-    data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]", r.Ingredients, r.Instructions, string.Join(", ", r.Categories.ToArray())).AddEmptyRow());
+    data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]",
+                                            ListLimitedView(ref data, r.Ingredients),
+                                            ListLimitedView(ref data, r.Instructions),
+                                            ListLimitedView(ref data, r.Categories)));
     AnsiConsole.Write(table);
 
     // User chooses the Action he would like to perform
@@ -32,8 +35,9 @@ while (true)
             .PageSize(10)
             .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
             .AddChoices(new[] {
-            "Add Recipe","Edit Recipe","Delete Recipe","Exit"
+            "View Recipe","Add Recipe","Edit Recipe","Delete Recipe","Exit"
             }));
+
 
     switch (choice)
     {
@@ -61,32 +65,16 @@ while (true)
 static void AddRecipe(ref Data data)
 {
     var title = AnsiConsole.Ask<string>("What is the [dodgerblue2]title[/] of your recipe?");
-    var ingredients = AnsiConsole.Ask<string>("What are the needed [dodgerblue2]ingredients[/]?");
-    var instructions = AnsiConsole.Ask<string>("What are the  [dodgerblue2]instuctions[/]?");
-    List<string> categories = new List<string>();
-    AnsiConsole.Markup("Please insert the [dodgerblue2]categories[/] of your recipe \n");
-    AnsiConsole.Markup("Press Enter after writing the category to add another, if you are done write [red]Done[/] then press Enter \n");
-    for (int i=0;i<10;i++){
-        
-        var category = AnsiConsole.Ask<string>("Category: ");
-        if (category == "Done")
-            break;
-        categories.Add(category);
-        
-    }
+    List<string> ingredients = ListInput(ref data,"ingredients");
+    List<string> instructions = ListInput(ref data, "instructions");
+    List<string> categories = ListInput(ref data, "categories");
     data.addRecipe(new Recipe(title,ingredients,instructions,categories));
 
 }
 
 static void EditRecipe(ref Data data)
 {
-    var title = AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-        .Title("Choose which recipe you would like to edit?")
-        .PageSize(10)
-        .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(data.Recipes.Select(r => r.Title)
-        ));
+    var title = RecipeSelection(ref data, "Choose which recipe you would like to edit?");
     var toEdit = AnsiConsole.Prompt(
     new SelectionPrompt<string>()
         .Title("Which attribute would you like to edit?")
@@ -165,12 +153,44 @@ static void CategoryChoiceMaker(ref Data data, string title)
 
 static void DeleteRecipe(ref Data data)
 {
-    var title = AnsiConsole.Prompt(
+    var title = RecipeSelection(ref data, "Choose which recipe you would like to delete?");
+    data.removeRecipe(title);
+}
+
+static string RecipeSelection(ref Data data, string text)
+{
+    AnsiConsole.Prompt(
     new SelectionPrompt<string>()
-        .Title("Choose which recipe you would like to delete?")
+        .Title(text)
         .PageSize(10)
         .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
         .AddChoices(data.Recipes.Select(r => r.Title)
         ));
-    data.removeRecipe(title);
+    return text;
+}
+
+static List<string> ListInput(ref Data data, string text)
+{
+    AnsiConsole.Markup($"Please insert the [dodgerblue2]{text}[/] of your recipe \n");
+    AnsiConsole.Markup("Press Enter after writing to add another\n If you are done write [red]Done[/] then press Enter \n");
+    string input;
+    List<string> inputList = new List<string>();
+    for (int i = 0; i < 30; i++)
+    {
+
+        input = AnsiConsole.Ask<string>("- ");
+        if (input == "Done")
+            break;
+        inputList.Add(input);
+
+    }
+    return inputList;
+}
+
+static string ListLimitedView(ref Data data, List<String> list)
+{
+    string result = string.Join(", ", list.ToArray());
+    if (result.Length > 30)
+        return result.Substring(0, 30)+"...";
+    return result;
 }
