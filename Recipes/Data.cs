@@ -31,43 +31,43 @@ class Data
         
     }
 
-    public void addRecipe(Recipe r)
+    public void AddRecipe(Recipe r)
     {
         Recipes.Add(r);
     }
-    public void removeRecipe(string title)
+    public void RemoveRecipe(string title)
     {
         Recipes.RemoveAll(x => x.Title == title);
     }
 
-    public void editTitle(string title, string newTitle)
+    public void EditTitle(string title, string newTitle)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => r.Title = newTitle).ToList();
     }
-    public void editIngredients(string title, string newIngredients)
+    public void EditIngredients(string title, string newIngredients)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Ingredients.Remove(newIngredients); r.Categories.Add(newIngredients); return r; }).ToList();
     }
-    public void editInstructions(string title, string newInstructions)
+    public void EditInstructions(string title, string newInstructions)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Ingredients.Remove(newInstructions); r.Categories.Add(newInstructions); return r; }).ToList();
     }
     
-    public void addCategory(string title, string newCategory)
+    public void AddCategory(string title, string newCategory)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Add(newCategory); return r; }).ToList();
 
     }
-    public void editCategory(string title, string category, string newCategory)
+    public void EditCategory(string title, string category, string newCategory)
     {
         Recipes.Where(r => r.Title.Equals(title)).Select(r => { r.Categories.Remove(category);r.Categories.Add(newCategory); return r; }).ToList();
     }
 
-    public void removeCategory(string title,string category)
+    public void RemoveCategory(string title,string category)
     {
         Recipes.Where(r => r.Title == title).ToList()[0].Categories.RemoveAll(c=>c == category);
     }
-    public void saveRecipes()
+    public void SaveRecipes()
     {
         File.WriteAllText(curFile, JsonSerializer.Serialize(Recipes));
     }

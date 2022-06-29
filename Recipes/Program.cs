@@ -1,33 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Spectre.Console;
-
-
-
-
 // Instantiate our data from json file
 Data data = new Data();
-
 while (true)
 {
-    AnsiConsole.Write(
-    new FigletText("Recipes")
-        .LeftAligned()
-        .Color(Color.Red));
-    // Create a table
-    var table = new Table().Border(TableBorder.Ascii2);
-    table.Expand();
-    // Create Table Columns
-    table.AddColumn("[dodgerblue2]Title[/]");
-    table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
-    table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
-    table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
-    // Add the Recipes to the table
-    data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]",
-                                            ListLimitedView(ref data, r.Ingredients),
-                                            ListLimitedView(ref data, r.Instructions),
-                                            ListLimitedView(ref data, r.Categories)));
-    AnsiConsole.Write(table);
-
+    
+    RecipeTableView(ref data);
     // User chooses the Action he would like to perform
     var choice = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
@@ -37,7 +15,40 @@ while (true)
             .AddChoices(new[] {
             "View Recipe","Add Recipe","Edit Recipe","Delete Recipe","Exit"
             }));
-
+    
+    if(choice =="View Recipe")
+    {
+       
+        // View recipes
+        var recipeTitle = RecipeSelection(ref data, "Choose which recipe you would like to view: ");
+        AnsiConsole.Clear();
+        AnsiConsole.Write(
+           new FigletText("Recipes")
+       .LeftAligned()
+       .Color(Color.Red));
+        // detailed view of recipe
+        var table = new Table().Border(TableBorder.Ascii2);
+        table.Expand();
+        table.AddColumn("[dodgerblue2]Title[/]");
+        table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
+        table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
+        table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
+        // Add the details of the recipe to the table
+        Recipe selectedRecipe = data.Recipes.FirstOrDefault(r => r.Title==recipeTitle);
+        table.AddRow(selectedRecipe.Title,
+                     String.Join("\n",selectedRecipe.Ingredients.Select((x) => $"- {x}")),
+                     String.Join("\n", selectedRecipe.Instructions.Select((x, n) => $"{n+1}. {x}")),
+                     String.Join("\n", selectedRecipe.Categories.Select((x) => $"- {x}")));
+        AnsiConsole.Write(table);
+        choice = AnsiConsole.Prompt(
+        new SelectionPrompt<string>()
+            .Title("What [red]action[/] would you like to perform on this recipe?")
+            .PageSize(10)
+            .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
+            .AddChoices(new[] {
+            "Edit Recipe","Delete Recipe","Back"
+            }));
+    }
 
     switch (choice)
     {
@@ -52,15 +63,11 @@ while (true)
             break;
         default: break;
     }
-
-    data.saveRecipes();
+    data.SaveRecipes();
     AnsiConsole.Clear();
     if (choice == "Exit")
         break;
 }
-
-
-
 
 static void AddRecipe(ref Data data)
 {
@@ -68,7 +75,7 @@ static void AddRecipe(ref Data data)
     List<string> ingredients = ListInput(ref data,"ingredients");
     List<string> instructions = ListInput(ref data, "instructions");
     List<string> categories = ListInput(ref data, "categories");
-    data.addRecipe(new Recipe(title,ingredients,instructions,categories));
+    data.AddRecipe(new Recipe(title,ingredients,instructions,categories));
 
 }
 
@@ -90,13 +97,13 @@ static void EditRecipe(ref Data data)
         switch (toEdit)
         {
             case "Title":
-                data.editTitle(title, newText);
+                data.EditTitle(title, newText);
                 break;
             case "Ingredients":
-                data.editIngredients(title, newText);
+                data.EditIngredients(title, newText);
                 break;
             case "Instructions":
-                data.editInstructions(title, newText);
+                data.EditInstructions(title, newText);
                 break;
         }
 
@@ -123,7 +130,7 @@ static void CategoryChoiceMaker(ref Data data, string title)
     switch (choice)
     {
         case "Add Category":
-            data.addCategory(title,AnsiConsole.Ask<string>("What is the name of your new [dodgerblue2]category[/]?"));
+            data.AddCategory(title,AnsiConsole.Ask<string>("What is the name of your new [dodgerblue2]category[/]?"));
             break;
 
         case "Edit Category":
@@ -133,7 +140,7 @@ static void CategoryChoiceMaker(ref Data data, string title)
                    .PageSize(10)
                    .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
                    .AddChoices(data.Recipes.Where(r => r.Title == title).ToList()[0].Categories.ToArray()));
-            data.editCategory(title,category, AnsiConsole.Ask<string>("What is the new name of the [dodgerblue2]category[/]?"));
+            data.EditCategory(title,category, AnsiConsole.Ask<string>("What is the new name of the [dodgerblue2]category[/]?"));
             break;
 
         case "Delete Category":
@@ -143,30 +150,28 @@ static void CategoryChoiceMaker(ref Data data, string title)
                    .PageSize(10)
                    .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
                    .AddChoices(data.Recipes.Where(r => r.Title == title).ToList()[0].Categories.ToArray()));
-            data.removeCategory(title, category);
+            data.RemoveCategory(title, category);
             break;
         default:break;
     }
 
 }
 
-
 static void DeleteRecipe(ref Data data)
 {
     var title = RecipeSelection(ref data, "Choose which recipe you would like to delete?");
-    data.removeRecipe(title);
+    data.RemoveRecipe(title);
 }
 
 static string RecipeSelection(ref Data data, string text)
 {
-    AnsiConsole.Prompt(
+    return AnsiConsole.Prompt(
     new SelectionPrompt<string>()
         .Title(text)
         .PageSize(10)
         .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
         .AddChoices(data.Recipes.Select(r => r.Title)
         ));
-    return text;
 }
 
 static List<string> ListInput(ref Data data, string text)
@@ -177,20 +182,41 @@ static List<string> ListInput(ref Data data, string text)
     List<string> inputList = new List<string>();
     for (int i = 0; i < 30; i++)
     {
-
         input = AnsiConsole.Ask<string>("- ");
         if (input == "Done")
             break;
         inputList.Add(input);
-
     }
     return inputList;
 }
 
-static string ListLimitedView(ref Data data, List<String> list)
+static string ListLimitedView( List<String> list)
 {
     string result = string.Join(", ", list.ToArray());
     if (result.Length > 30)
         return result.Substring(0, 30)+"...";
     return result;
+}
+
+static void RecipeTableView(ref Data data)
+{
+    AnsiConsole.Write(
+    new FigletText("Recipes")
+        .LeftAligned()
+        .Color(Color.Red));
+    // View recipes
+    // Create a table
+    var table = new Table().Border(TableBorder.Ascii2);
+    table.Expand();
+    // Create Table Columns
+    table.AddColumn("[dodgerblue2]Title[/]");
+    table.AddColumn(new TableColumn("[dodgerblue2]Ingredients[/]").Centered());
+    table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
+    table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").Centered());
+    // Add the Recipes to the table
+    data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]",
+                                            ListLimitedView(r.Ingredients),
+                                            ListLimitedView(r.Instructions),
+                                            ListLimitedView(r.Categories)));
+    AnsiConsole.Write(table);
 }
