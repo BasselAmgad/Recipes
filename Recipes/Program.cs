@@ -90,21 +90,18 @@ static void EditRecipe(ref Data data)
             "Title","Ingredients","Instructions","Categories"
 
         }));
-    string newText;
     if (toEdit != "Categories")
-    { 
+    {
+        var newText = AnsiConsole.Ask<string>($"Please enter the new [dodgerblue2]{toEdit}[/] of your recipe?");
         switch (toEdit)
         {
             case "Title":
-                newText = AnsiConsole.Ask<string>($"Please enter the new [dodgerblue2]{toEdit}[/] of your recipe?");
                 data.EditTitle(title, newText);
                 break;
             case "Ingredients":
-                newText = MultiLineInput(ref data, "new ingredients");
                 data.EditIngredients(title, newText);
                 break;
             case "Instructions":
-                newText = MultiLineInput(ref data, "new instructions");
                 data.EditInstructions(title, newText);
                 break;
         }
@@ -172,7 +169,7 @@ static string RecipeSelection(ref Data data, string text)
         .Title(text)
         .PageSize(10)
         .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(data.Recipes.Select((r,n) =>$"{n+1}. {r.Title}" )
+        .AddChoices(data.Recipes.Select(r => r.Title)
         ));
 }
 
