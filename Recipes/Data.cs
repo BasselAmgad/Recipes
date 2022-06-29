@@ -7,11 +7,12 @@ using System.Text.Json;
 
 class Data
 {
-    // Always initialize list properties with new(). This way we eliminate risk of null.
-    public List<Recipe> Recipes = new();
+
+    public List<Recipe> Recipes { get; set; }
     private string _filePath;
     public Data()
     {
+        Recipes = new List<Recipe>();
         // This method creates a path where we have access to read and write data inside the ProgramData folder
         var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         _filePath = Path.Combine(systemPath, "Recipes.json");
