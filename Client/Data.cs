@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-
+﻿using System.Text.Json;
 class Data
 {
     public List<Recipe> Recipes { get; set; }
     private string _filePath;
 
-    public Data()
+    public Data ()
     {
-
         Recipes = new();
         // This method creates a path where we have access to read and write data inside the ProgramData folder
         var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -39,41 +32,41 @@ class Data
         Recipes.Add(r);
     }
 
-    public void RemoveRecipe(string title)
+    public void RemoveRecipe(Guid id)
     {
-        Recipes.Remove(Recipes.Find(r => r.Title == title));
+        Recipes.Remove(Recipes.Find(r => r.Id == id));
     }
 
-    public void EditTitle(string title, string newTitle)
+    public void EditTitle(Guid id, string newTitle)
     {
-        Recipes.Find(r => r.Title == title).Title = newTitle;
+        Recipes.Find(r => r.Id == id).Title = newTitle;
     }
 
-    public void EditIngredients(string title, string newIngredients)
+    public void EditIngredients(Guid id, string newIngredients)
     {
-        Recipes.Find(r => r.Title == title).Ingredients = newIngredients;
+        Recipes.Find(r => r.Id == id).Ingredients = newIngredients;
     }
 
-    public void EditInstructions(string title, string newInstructions)
+    public void EditInstructions(Guid id, string newInstructions)
     {
-        Recipes.Find(r => r.Title == title).Instructions = newInstructions;
+        Recipes.Find(r => r.Id == id).Instructions = newInstructions;
     }
 
-    public void AddCategory(string title, string newCategory)
+    public void AddCategory(Guid id, string newCategory)
     {
-        Recipes.Find(r => r.Title == title).Categories.Add(newCategory);
+        Recipes.Find(r => r.Id == id).Categories.Add(newCategory);
 
     }
 
-    public void RemoveCategory(string title, string category)
+    public void RemoveCategory(Guid id, string category)
     {
-        Recipes.Where(r => r.Title == title).ToList()[0].Categories.RemoveAll(c => c == category);
+        Recipes.Where(r => r.Id == id).ToList()[0].Categories.RemoveAll(c => c == category);
     }
 
-    public void EditCategory(string title, string category, string newCategory)
+    public void EditCategory(Guid id, string category, string newCategory)
     {
-        RemoveCategory(title, newCategory);
-        AddCategory(title, newCategory);
+        RemoveCategory(id, newCategory);
+        AddCategory(id, newCategory);
     }
 
     public void SaveRecipes()

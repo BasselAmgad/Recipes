@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 // Instantiate our data from json file
-Data data = new Data();
+var data = new Data();
 
 while (true)
 {
@@ -17,7 +17,7 @@ while (true)
     if (choice == "View Recipe")
     {
         // View recipes
-        var recipeTitle = RecipeSelection(ref data, "Choose which recipe you would like to view: ");
+        var recipeId = RecipeSelection(ref data, "Choose which recipe you would like to view: ");
         AnsiConsole.Clear();
         AnsiConsole.Write(
            new FigletText("Recipes")
@@ -31,7 +31,7 @@ while (true)
         table.AddColumn(new TableColumn("[dodgerblue2]Instructions[/]").LeftAligned());
         table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").LeftAligned());
         // Add the details of the recipe to the table
-        Recipe selectedRecipe = data.Recipes.FirstOrDefault(r => r.Title == recipeTitle);
+        Recipe selectedRecipe = data.Recipes.FirstOrDefault(r => r.Id == recipeId);
         table.AddRow(selectedRecipe.Title,
                      String.Join("\n", selectedRecipe.Ingredients.Split(",").Select(x => $"{x}")),
                      String.Join("\n", selectedRecipe.Instructions.Split(",").Select((x, n) => $"- {x}")),
@@ -76,74 +76,72 @@ static void AddRecipe(ref Data data)
 
 static void EditRecipe(ref Data data)
 {
-    var title = RecipeSelection(ref data, "Choose which recipe you would like to edit?");
+    var recipeId = RecipeSelection(ref data, "Choose which recipe you would like to edit?");
     var toEdit = AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-        .Title("Which attribute would you like to edit?")
-        .PageSize(10)
-        .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(new[] {
-            "Title","Ingredients","Instructions","Categories"
+        new SelectionPrompt<string>()
+            .Title("Which attribute would you like to edit?")
+            .PageSize(10)
+            .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
+            .AddChoices(new[] {
+                "Title","Ingredients","Instructions","Categories"
 
-        }));
+            }));
     if (toEdit != "Categories")
     {
-        var newText = AnsiConsole.Ask<string>($"Please enter the new [dodgerblue2]{toEdit}[/] of your recipe?");
+        var newChange = MultiLineInput(ref data, toEdit);
         switch (toEdit)
         {
             case "Title":
-                data.EditTitle(title, newText);
+                data.EditTitle(recipeId, newChange);
                 break;
             case "Ingredients":
-                data.EditIngredients(title, newText);
+                data.EditIngredients(recipeId, newChange);
                 break;
             case "Instructions":
-                data.EditInstructions(title, newText);
+                data.EditInstructions(recipeId, newChange);
                 break;
         }
     }
     else
     {
-        CategoryChoiceMaker(ref data, title);
+        CategoryChoiceMaker(ref data, recipeId);
     }
 }
 
-static void CategoryChoiceMaker(ref Data data, string title)
+static void CategoryChoiceMaker(ref Data data, Guid recipeId)
 {
     var choice = AnsiConsole.Prompt(
-   new SelectionPrompt<string>()
-       .Title("What would you like to do?")
-       .PageSize(10)
-       .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-       .AddChoices(new[] {
-            "Add Category","Edit Category","Delete Category"
+       new SelectionPrompt<string>()
+           .Title("What would you like to do?")
+           .PageSize(10)
+           .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
+           .AddChoices(new[] {
+                "Add Category","Edit Category","Delete Category"
 
-       }));
+           }));
     string category;
     switch (choice)
     {
         case "Add Category":
-            data.AddCategory(title, AnsiConsole.Ask<string>("What is the name of your new [dodgerblue2]category[/]?"));
+            data.AddCategory(recipeId, AnsiConsole.Ask<string>("What is the name of your new [dodgerblue2]category[/]?"));
             break;
-
         case "Edit Category":
             category = AnsiConsole.Prompt(
              new SelectionPrompt<string>()
                    .Title("Which Category would you like to edit?")
                    .PageSize(10)
                    .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-                   .AddChoices(data.Recipes.Where(r => r.Title == title).ToList()[0].Categories.ToArray()));
-            data.EditCategory(title, category, AnsiConsole.Ask<string>("What is the new name of the [dodgerblue2]category[/]?"));
+                   .AddChoices(data.Recipes.Where(r => r.Id == recipeId).ToList()[0].Categories.ToArray()));
+            data.EditCategory(recipeId, category, AnsiConsole.Ask<string>("What is the new name of the [dodgerblue2]category[/]?"));
             break;
-
         case "Delete Category":
             category = AnsiConsole.Prompt(
              new SelectionPrompt<string>()
                    .Title("Which Category would you like to remove?")
                    .PageSize(10)
                    .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-                   .AddChoices(data.Recipes.Where(r => r.Title == title).ToList()[0].Categories.ToArray()));
-            data.RemoveCategory(title, category);
+                   .AddChoices(data.Recipes.Where(r => r.Id == recipeId).ToList()[0].Categories.ToArray()));
+            data.RemoveCategory(recipeId, category);
             break;
         default: break;
     }
@@ -151,20 +149,21 @@ static void CategoryChoiceMaker(ref Data data, string title)
 
 static void DeleteRecipe(ref Data data)
 {
-    var title = RecipeSelection(ref data, "Choose which recipe you would like to delete?");
-    data.RemoveRecipe(title);
+    var recipeId = RecipeSelection(ref data, "Choose which recipe you would like to delete?");
+    data.RemoveRecipe(recipeId);
 }
 
-static string RecipeSelection(ref Data data, string text)
+static Guid RecipeSelection(ref Data data, string text)
 {
-    return AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-        .Title(text)
-        .PageSize(10)
-        .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(data.Recipes.Select((r, n) => $"{r.Title}")
-        ));
+    var recipeIndex = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title(text)
+                            .PageSize(10)
+                            .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
+                            .AddChoices(data.Recipes.Select((r, n) => $"{n}- {r.Title}")))[0] - '0';
+    return data.Recipes[recipeIndex].Id;
 }
+
 
 static string MultiLineInput(ref Data data, string text)
 {
@@ -200,7 +199,6 @@ static List<string> ListInput(ref Data data, string text)
 
 static string stringLimiter(string input)
 {
-    Console.WriteLine(input);
     if (input.Length > 30)
         return input.Substring(0, 30) + "...";
 
