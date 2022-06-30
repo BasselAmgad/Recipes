@@ -67,7 +67,7 @@ while (true)
 
 static void AddRecipe(ref Data data)
 {
-    var title = AnsiConsole.Ask<string>("What is the [dodgerblue2]title[/] of your recipe?");
+    var title = takeInput("title");
     string ingredients = MultiLineInput(ref data, "ingredients");
     string instructions = MultiLineInput(ref data, "instructions");
     List<string> categories = ListInput(ref data, "categories");
@@ -88,17 +88,16 @@ static void EditRecipe(ref Data data)
             }));
     if (toEdit != "Categories")
     {
-        var newChange = MultiLineInput(ref data, toEdit);
         switch (toEdit)
         {
             case "Title":
-                data.EditTitle(recipeId, newChange);
+                data.EditTitle(recipeId, takeInput("title"));
                 break;
             case "Ingredients":
-                data.EditIngredients(recipeId, newChange);
+                data.EditIngredients(recipeId, MultiLineInput(ref data, toEdit));
                 break;
             case "Instructions":
-                data.EditInstructions(recipeId, newChange);
+                data.EditInstructions(recipeId, MultiLineInput(ref data, toEdit));
                 break;
         }
     }
@@ -166,14 +165,21 @@ static Guid RecipeSelection(ref Data data, string text)
 
 
 static string MultiLineInput(ref Data data, string text)
-{
+{   
     AnsiConsole.Markup($"Please insert the [dodgerblue2]{text}[/] of your recipe \n");
     AnsiConsole.Markup("Press Enter after writing to add another\n If you are done write [red]Done[/] then press Enter \n");
     string input;
     string inputString = "";
     for (int i = 0; i < 30; i++)
     {
-        input = AnsiConsole.Ask<string>("- ");
+        input = AnsiConsole.Prompt(
+        new TextPrompt<string>("- ")
+        .ValidationErrorMessage("[red]This is not a valid INPUT[/]")
+        .Validate(input =>
+        {
+            return input.Length < 3 ? ValidationResult.Error("[red]Need to write at least 3 letters[/]") : ValidationResult.Success();
+        })
+        ); ;
         if (input == "Done")
             break;
         inputString += $"{input}, ";
@@ -195,6 +201,18 @@ static List<string> ListInput(ref Data data, string text)
         inputList.Add(input);
     }
     return inputList;
+}
+
+static string takeInput(string text)
+{
+    return AnsiConsole.Prompt(
+        new TextPrompt<string>($"What is the [dodgerblue2]{text}[/] of your recipe?")
+        .ValidationErrorMessage("[red]This is not a valid INPUT[/]")
+        .Validate(input =>
+        {
+            return input.Length < 3 ? ValidationResult.Error("[red]Need to write at least 3 letters[/]") : ValidationResult.Success();
+        })
+        );
 }
 
 static string stringLimiter(string input)
