@@ -1,10 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Spectre.Console;
+﻿using Spectre.Console;
 // Instantiate our data from json file
 Data data = new Data();
+
 while (true)
 {
-
     RecipeTableView(ref data);
     // User chooses the Action he would like to perform
     var choice = AnsiConsole.Prompt(
@@ -15,7 +14,6 @@ while (true)
             .AddChoices(new[] {
             "View Recipe","Add Recipe","Edit Recipe","Delete Recipe","Exit"
             }));
-
     if (choice == "View Recipe")
     {
         // View recipes
@@ -35,8 +33,8 @@ while (true)
         // Add the details of the recipe to the table
         Recipe selectedRecipe = data.Recipes.FirstOrDefault(r => r.Title == recipeTitle);
         table.AddRow(selectedRecipe.Title,
-                     String.Join("\n", selectedRecipe.Ingredients.Split(",").Select((x) => $"- {x}")),
-                     String.Join("\n", selectedRecipe.Instructions.Split(",").Select((x, n) => $"{n + 1}. {x}")),
+                     String.Join("\n", selectedRecipe.Ingredients.Split(",").Select(x => $"{x}")),
+                     String.Join("\n", selectedRecipe.Instructions.Split(",").Select((x, n) => $"- {x}")),
                      String.Join("\n", selectedRecipe.Categories.Select((x) => $"- {x}")));
         AnsiConsole.Write(table);
         choice = AnsiConsole.Prompt(
@@ -48,7 +46,6 @@ while (true)
             "Edit Recipe","Delete Recipe","Back"
             }));
     }
-
     switch (choice)
     {
         case "Add Recipe":
@@ -75,7 +72,6 @@ static void AddRecipe(ref Data data)
     string instructions = MultiLineInput(ref data, "instructions");
     List<string> categories = ListInput(ref data, "categories");
     data.AddRecipe(new Recipe(title, ingredients, instructions, categories));
-
 }
 
 static void EditRecipe(ref Data data)
@@ -105,13 +101,11 @@ static void EditRecipe(ref Data data)
                 data.EditInstructions(title, newText);
                 break;
         }
-
     }
     else
     {
         CategoryChoiceMaker(ref data, title);
     }
-
 }
 
 static void CategoryChoiceMaker(ref Data data, string title)
@@ -153,7 +147,6 @@ static void CategoryChoiceMaker(ref Data data, string title)
             break;
         default: break;
     }
-
 }
 
 static void DeleteRecipe(ref Data data)
@@ -169,7 +162,7 @@ static string RecipeSelection(ref Data data, string text)
         .Title(text)
         .PageSize(10)
         .MoreChoicesText("[grey](Move up and down to reveal more choices)[/]")
-        .AddChoices(data.Recipes.Select(r => r.Title)
+        .AddChoices(data.Recipes.Select((r, n) => $"{r.Title}")
         ));
 }
 
@@ -184,9 +177,9 @@ static string MultiLineInput(ref Data data, string text)
         input = AnsiConsole.Ask<string>("- ");
         if (input == "Done")
             break;
-        inputString+=$"{input}, ";
+        inputString += $"{input}, ";
     }
-    return inputString.Substring(0,inputString.Length-2);
+    return inputString.Substring(0, inputString.Length - 2);
 }
 
 static List<string> ListInput(ref Data data, string text)
@@ -210,7 +203,7 @@ static string stringLimiter(string input)
     Console.WriteLine(input);
     if (input.Length > 30)
         return input.Substring(0, 30) + "...";
-    
+
     return input;
 }
 
@@ -228,8 +221,6 @@ static void RecipeTableView(ref Data data)
     new FigletText("Recipes")
         .LeftAligned()
         .Color(Color.Red));
-    // View recipes
-    // Create a table
     var table = new Table().Border(TableBorder.Ascii2);
     table.Expand();
     // Create Table Columns
