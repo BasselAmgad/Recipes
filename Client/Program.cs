@@ -1,4 +1,5 @@
 ﻿using Spectre.Console;
+
 // Instantiate our data from json file
 var data = new Data();
 
