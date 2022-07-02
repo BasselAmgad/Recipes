@@ -82,7 +82,7 @@ class Data
 
     public void EditCategory(Guid id, string category, string newCategory)
     {
-        RemoveCategory(id, newCategory);
+        RemoveCategory(id, category);
         AddCategory(id, newCategory);
     }
 
@@ -90,5 +90,4 @@ class Data
     {
         File.WriteAllText(_filePath, JsonSerializer.Serialize(Recipes));
     }
-
 }
