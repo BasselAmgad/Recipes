@@ -6,7 +6,7 @@ var app = builder.Build();
 app.MapGet("/recipes", () => 
 {
     Data data = new Data();
-    return JsonSerializer.Serialize(data.GetRecipes());
+    return data.GetRecipes();
 });
 
 app.Run();
