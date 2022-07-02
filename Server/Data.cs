@@ -1,19 +1,19 @@
 ﻿using System.Text.Json;
 class Data
 {
-    private List<Recipe> Recipes { get; set; }
+    private List<Recipe> _recipes { get; set; }
     private string _filePath;
 
     public Data ()
     {
-        Recipes = new();
+        _recipes = new();
         // This method creates a path where we have access to read and write data inside the ProgramData folder
         var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         _filePath = Path.Combine(systemPath, "Recipes.json");
         if (!File.Exists(this._filePath))
         {
-            Recipes = new List<Recipe>();
-            File.WriteAllText(this._filePath, JsonSerializer.Serialize(Recipes));
+            _recipes = new List<Recipe>();
+            File.WriteAllText(this._filePath, JsonSerializer.Serialize(_recipes));
         }
         else
         {
@@ -22,24 +22,24 @@ class Data
                 var data = r.ReadToEnd();
                 var json = JsonSerializer.Deserialize<List<Recipe>>(data);
                 if (json != null)
-                    Recipes = json;
+                    _recipes = json;
             }
         }
     }
 
     public List<Recipe> GetRecipes()
     {
-        return Recipes;
+        return _recipes;
     }
 
     public void AddRecipe(Recipe r)
     {
-        Recipes.Add(r);
+        _recipes.Add(r);
     }
 
     public Recipe getRecipe(Guid id)
     {
-        var recipe = Recipes.Find(r => r.Id == id);
+        var recipe = _recipes.Find(r => r.Id == id);
         ArgumentNullException.ThrowIfNull(recipe, "No Recipe exists with this ID");
         return recipe;
     }
@@ -47,7 +47,7 @@ class Data
     public void RemoveRecipe(Guid id)
     {
         var recipe = getRecipe(id); 
-        Recipes.Remove(recipe);
+        _recipes.Remove(recipe);
     }
 
     public void EditTitle(Guid id, string newTitle)
@@ -88,6 +88,6 @@ class Data
 
     public void SaveRecipes()
     {
-        File.WriteAllText(_filePath, JsonSerializer.Serialize(Recipes));
+        File.WriteAllText(_filePath, JsonSerializer.Serialize(_recipes));
     }
 }
