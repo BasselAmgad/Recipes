@@ -4,7 +4,7 @@ class Data
     public List<Recipe> Recipes { get; set; }
     private string _filePath;
 
-    public Data ()
+    public Data()
     {
         Recipes = new();
         // This method creates a path where we have access to read and write data inside the ProgramData folder
@@ -27,45 +27,62 @@ class Data
         }
     }
 
+    public List<Recipe> GetRecipes()
+    {
+        return Recipes;
+    }
+
     public void AddRecipe(Recipe r)
     {
         Recipes.Add(r);
     }
 
+    public Recipe getRecipe(Guid id)
+    {
+        var recipe = Recipes.Find(r => r.Id == id);
+        ArgumentNullException.ThrowIfNull(recipe, "No Recipe exists with this ID");
+        return recipe;
+    }
+
     public void RemoveRecipe(Guid id)
     {
-        Recipes.Remove(Recipes.Find(r => r.Id == id));
+        var recipe = getRecipe(id);
+        Recipes.Remove(recipe);
     }
 
     public void EditTitle(Guid id, string newTitle)
     {
-        Recipes.Find(r => r.Id == id).Title = newTitle;
+        var recipe = getRecipe(id);
+        recipe.Title = newTitle;
     }
 
     public void EditIngredients(Guid id, string newIngredients)
     {
-        Recipes.Find(r => r.Id == id).Ingredients = newIngredients;
+        var recipe = getRecipe(id);
+        recipe.Ingredients = newIngredients;
     }
 
     public void EditInstructions(Guid id, string newInstructions)
     {
-        Recipes.Find(r => r.Id == id).Instructions = newInstructions;
+        var recipe = getRecipe(id);
+        recipe.Instructions = newInstructions;
     }
 
     public void AddCategory(Guid id, string newCategory)
     {
-        Recipes.Find(r => r.Id == id).Categories.Add(newCategory);
-
+        var recipe = getRecipe(id);
+        recipe.Categories.Add(newCategory);
     }
 
     public void RemoveCategory(Guid id, string category)
     {
-        Recipes.Where(r => r.Id == id).ToList()[0].Categories.RemoveAll(c => c == category);
+        var recipe = getRecipe(id);
+        recipe.Categories.RemoveAll(c => c == category);
     }
 
     public void EditCategory(Guid id, string category, string newCategory)
     {
-        RemoveCategory(id, newCategory);
+        RemoveCategory(id, category);
         AddCategory(id, newCategory);
     }
 
@@ -73,5 +90,4 @@ class Data
     {
         File.WriteAllText(_filePath, JsonSerializer.Serialize(Recipes));
     }
-
 }
