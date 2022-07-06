@@ -1,8 +1,5 @@
 ﻿using Spectre.Console;
-
-// Instantiate our data from json file
 var data = new Data();
-
 while (true)
 {
     RecipeTableView(ref data);
@@ -68,7 +65,7 @@ while (true)
 
 static void AddRecipe(ref Data data)
 {
-    var title = takeInput("title");
+    var title = TakeInput("title");
     string ingredients = MultiLineInput(ref data, "ingredients");
     string instructions = MultiLineInput(ref data, "instructions");
     List<string> categories = ListInput(ref data, "categories");
@@ -92,7 +89,7 @@ static void EditRecipe(ref Data data)
         switch (toEdit)
         {
             case "Title":
-                data.EditTitle(recipeId, takeInput("title"));
+                data.EditTitle(recipeId, TakeInput("title"));
                 break;
             case "Ingredients":
                 data.EditIngredients(recipeId, MultiLineInput(ref data, toEdit));
@@ -164,9 +161,8 @@ static Guid RecipeSelection(ref Data data, string text)
     return data.Recipes[recipeIndex].Id;
 }
 
-
 static string MultiLineInput(ref Data data, string text)
-{   
+{
     AnsiConsole.Markup($"Please insert the [dodgerblue2]{text}[/] of your recipe \n");
     AnsiConsole.Markup("Press Enter after writing to add another\n If you are done write [red]Done[/] then press Enter \n");
     string input;
@@ -204,7 +200,7 @@ static List<string> ListInput(ref Data data, string text)
     return inputList;
 }
 
-static string takeInput(string text)
+static string TakeInput(string text)
 {
     return AnsiConsole.Prompt(
         new TextPrompt<string>($"What is the [dodgerblue2]{text}[/] of your recipe?")
@@ -216,11 +212,10 @@ static string takeInput(string text)
         );
 }
 
-static string stringLimiter(string input)
+static string StringLimiter(string input)
 {
     if (input.Length > 30)
         return input.Substring(0, 30) + "...";
-
     return input;
 }
 
@@ -247,8 +242,8 @@ static void RecipeTableView(ref Data data)
     table.AddColumn(new TableColumn("[dodgerblue2]Categories[/]").LeftAligned());
     // Add the Recipes to the table
     data.Recipes.ForEach(r => table.AddRow("[bold][red]" + r.Title + "[/][/]",
-                                            stringLimiter(r.Ingredients),
-                                            stringLimiter(r.Instructions),
+                                            StringLimiter(r.Ingredients),
+                                            StringLimiter(r.Instructions),
                                             ListLimitedView(r.Categories)));
     AnsiConsole.Write(table);
 }
